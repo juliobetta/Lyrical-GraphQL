@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { compose } from 'lodash/fp';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 import { Link } from 'react-router';
@@ -24,14 +25,36 @@ class SongList extends Component {
   renderSongs() {
     return (
       <ul className="collection">
-        {this.props.data.songs.map(song =>
-          <li key={song.id} className="collection-item">
-            {song.title}
+        {this.props.data.songs.map(({ title, id }) =>
+          <li key={id} className="collection-item">
+            {title}
+            <i
+              className="material-icons"
+              onClick={() => this.onSongDelete(id)}
+            >
+              delete
+            </i>
           </li>
         )}
       </ul>
     );
   }
+
+  onSongDelete(id) {
+    return this.props.mutate({ variables: { id } })
+      .then(() => this.props.data.refetch());
+  }
 }
 
-export default graphql(query)(SongList);
+const mutation = gql`
+  mutation DeleteSong($id: ID) {
+    deleteSong(id: $id) {
+      id
+    }
+  }
+`;
+
+export default compose(
+  graphql(mutation),
+  graphql(query)
+)(SongList);
