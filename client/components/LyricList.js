@@ -13,7 +13,7 @@ class LyricList extends Component {
             <div className="vote-box">
               <i
                 className="material-icons"
-                onClick={() => this.onLike(id, likes)}
+                onClick={this.onLike({ id, likes })}
               >
                 thumb_up
               </i>
@@ -25,8 +25,8 @@ class LyricList extends Component {
     )
   }
 
-  onLike(id, likes) {
-    return this.props.mutate({
+  onLike = ({ id, likes }) => () => (
+    this.props.mutate({
       variables: { id },
       optimisticResponse: {
         __typename: 'Mutation',
@@ -36,8 +36,8 @@ class LyricList extends Component {
           likes: likes + 1
         }
       }
-    });
-  }
+    })
+  );
 }
 
 const mutation = gql`

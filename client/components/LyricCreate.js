@@ -3,15 +3,11 @@ import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
 
 class LyricCreate extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = { content: '' };
-  }
+  state = { content: '' };
 
   render() {
     return (
-      <form onSubmit={this.onSubmit.bind(this)}>
+      <form onSubmit={this.onSubmit}>
         <label>Add a Lyric</label>
         <input
           value={this.state.content}
@@ -21,7 +17,7 @@ class LyricCreate extends Component {
     )
   }
 
-  onSubmit(event) {
+  onSubmit = event => {
     event.preventDefault();
 
     this.setState({ content: '' });

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { compose } from 'lodash/fp';
 import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import query from '../queries/fetchSongs';
 
 class SongList extends Component {
@@ -30,7 +30,7 @@ class SongList extends Component {
             <Link to={`/songs/${id}`}>{title}</Link>
             <i
               className="material-icons"
-              onClick={() => this.onSongDelete(id)}
+              onClick={this.onSongDelete(id)}
             >
               delete
             </i>
@@ -40,10 +40,10 @@ class SongList extends Component {
     );
   }
 
-  onSongDelete(id) {
-    return this.props.mutate({ variables: { id } })
-      .then(() => this.props.data.refetch());
-  }
+  onSongDelete = id => () => (
+    this.props.mutate({ variables: { id } })
+      .then(() => this.props.data.refetch())
+  );
 }
 
 const mutation = gql`

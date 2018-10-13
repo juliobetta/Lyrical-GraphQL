@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { graphql } from 'react-apollo';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 import LyricCreate from './LyricCreate';
 import LyricList from './LyricList';
 import query from '../queries/fetchSong';
@@ -26,5 +26,5 @@ class SongDetail extends Component {
 }
 
 export default graphql(query, {
-  options: ({ params: { id } }) => ({ variables: { id } })
+  options: ({ match: { params: { id } } }) => ({ variables: { id } })
 })(SongDetail);
