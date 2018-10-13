@@ -1,60 +1,63 @@
 import React, { Component } from 'react';
 import { compose } from 'lodash/fp';
 import gql from 'graphql-tag';
-import { graphql } from 'react-apollo';
-import { Link } from 'react-router';
-import query from '../queries/fetchSongs';
+import { Query, Mutation } from 'react-apollo';
+import { Link } from 'react-router-dom';
+import { fetchSongs, deleteSong } from '../graphql/song';
 
 class SongList extends Component {
   render() {
-    if (this.props.data.loading) {
-      return <div>Loading...</div>
-    }
-
     return (
-      <div>
-        {this.renderSongs()}
+      <Query query={fetchSongs}>
+        {({ loading, data }) => {
+          if (loading) {
+            return <div>Loading...</div>
+          }
 
-        <Link to="/songs/new" className="btn-floating btn-large red right">
-          <i className="material-icons">add</i>
-        </Link>
-      </div>
+          return (
+            <div>
+              {this.renderSongs(data.songs)}
+
+              <Link to="/songs/new" className="btn-floating btn-large red right">
+                <i className="material-icons">add</i>
+              </Link>
+            </div>
+          );
+        }}
+      </Query>
     );
   }
 
-  renderSongs() {
+  renderSongs(songs) {
     return (
       <ul className="collection">
-        {this.props.data.songs.map(({ title, id }) =>
-          <li key={id} className="collection-item">
-            <Link to={`/songs/${id}`}>{title}</Link>
-            <i
-              className="material-icons"
-              onClick={() => this.onSongDelete(id)}
-            >
-              delete
-            </i>
-          </li>
+        {songs.map(({ title, id }) =>
+          <Mutation key={id} mutation={deleteSong} update={this.onDeleteSong(id)}>
+            {deleteSong => (
+              <li className="collection-item">
+                <Link to={`/songs/${id}`}>{title}</Link>
+                <i
+                  className="material-icons"
+                  onClick={() => deleteSong({ variables: { id } })}
+                >
+                  delete
+                </i>
+              </li>
+            )}
+          </Mutation>
         )}
       </ul>
     );
   }
 
-  onSongDelete(id) {
-    return this.props.mutate({ variables: { id } })
-      .then(() => this.props.data.refetch());
+  onDeleteSong = songId => (cache, { data: { deleteSong } }) => {
+    const { songs } = cache.readQuery({ query: fetchSongs });
+
+    return cache.writeQuery({
+      query: fetchSongs,
+      data: { songs: songs.filter(({ id }) => id !== songId) }
+    })
   }
 }
 
-const mutation = gql`
-  mutation DeleteSong($id: ID) {
-    deleteSong(id: $id) {
-      id
-    }
-  }
-`;
-
-export default compose(
-  graphql(mutation),
-  graphql(query)
-)(SongList);
+export default SongList;
