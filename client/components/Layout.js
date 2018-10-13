@@ -18,13 +18,9 @@ export default class extends Component {
    * @param {React.Component} WrappedComponent
    * @return {function(matchProps): React.Component} the router matched props
    */
-  renderComponent = WrappedComponent => matchProps => {
-    console.log(this.props.location);
-
-    return (
-      <div className="container">
-        <WrappedComponent {...matchProps} location={this.props.location} />
-      </div>
-    );
-  };
+  renderComponent = WrappedComponent => matchProps => (
+    <div className="container">
+      <WrappedComponent {...matchProps} location={this.props.location} />
+    </div>
+  );
 };

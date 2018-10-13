@@ -1,30 +1,32 @@
 import React, { Component } from 'react';
-import { graphql } from 'react-apollo';
+import { Query } from 'react-apollo';
 import { Link } from 'react-router-dom';
 import LyricCreate from './LyricCreate';
 import LyricList from './LyricList';
-import query from '../queries/fetchSong';
+import { fetchSong } from '../graphql/song';
 
 
 class SongDetail extends Component {
   render() {
-    const { data: { song = null }, data } = this.props;
-
-    if(data.loading) {
-      return <div>Loading...</div>
-    }
-
     return (
-      <div>
-        <Link to="/">Back</Link>
-        <h3>{song.title}</h3>
-        <LyricList lyrics={song.lyrics} />
-        <LyricCreate songId={song.id}/>
-      </div>
+      <Query query={fetchSong} variables={{ id: this.props.match.params.id }}>
+        {({ loading, data: { song = null } }) => {
+          if (loading) {
+            return <div>Loading...</div>
+          }
+
+          return (
+            <div>
+              <Link to="/">Back</Link>
+              <h3>{song.title}</h3>
+              <LyricList lyrics={song.lyrics} />
+              <LyricCreate songId={song.id} />
+            </div>
+          );
+        }}
+      </Query>
     )
   }
 }
 
-export default graphql(query, {
-  options: ({ match: { params: { id } } }) => ({ variables: { id } })
-})(SongDetail);
+export default SongDetail;
