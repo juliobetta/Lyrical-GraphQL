@@ -19,7 +19,7 @@ const client = new ApolloClient({
    * @see https://dev.apollodata.com/react/cache-updates.html
   */
   dataIdFromObject: o => o.id,
-
+  connectToDevTools: true,
   link: new HttpLink({ uri: '/graphql' }),
   cache: new InMemoryCache()
 });
